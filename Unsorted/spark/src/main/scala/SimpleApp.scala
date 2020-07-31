@@ -10,7 +10,7 @@ object SimpleApp {
       .master("local[2]")
       .getOrCreate()
 
-    read_count()
+    ChangeColumnElement.execute()
 
     spark.stop()
   }
