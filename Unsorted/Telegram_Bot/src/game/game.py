@@ -1,13 +1,53 @@
+from statemachine import StateMachine, State
 from localization import *
+from enum import Enum
+
+import random
 
 
-class Game:
-    def __init__(self):
+class TurnResult(Enum):
+    keep_turn = 1
+    next_turn = 2
+    game_ended = 3
+
+
+class Game(StateMachine):
+    _idle = State('Idle', initial=True)
+    _created = State('Created')
+    _playing = State('Playing')
+
+    _create = _idle.to(_created)
+    _play = _created.to(_playing)
+    _stop = _created.to(_idle) | _playing.to(_idle)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.room = dict()
         self.pairs = list()
+        self.players = list()
         self.curr = None
-        self.is_created = False
-        self.is_started = False
+
+    def create_room(self):
+        self.clear()
+        self._create()
+
+    def play(self):
+        self.players = list(self.room)
+        pairs = pair_up(self.players)
+        random.shuffle(pairs)
+        self.curr = pairs.pop()
+        self._play()
+
+    def join(self, player_name):
+        self.room[player_name] = 0
+
+    def stop(self):
+        self.clear()
+        self._stop()
+
+    def clear(self):
+        self.room.clear()
+        self.players.clear()
 
     def get_current_by_name(self, player_name):
         if self.curr[0].name == player_name:
@@ -23,16 +63,16 @@ class Game:
         second = self.curr[1]
 
         if first.answer is None or second.answer is None:
-            return False
+            return TurnResult.keep_turn
 
         if first.answer == LIE_WORD and second.answer == LIE_WORD:
-            return True
+            return TurnResult.next_turn
 
         if first.answer == BELIEVE_WORD and second.answer == BELIEVE_WORD:
             self.room[first.name] = self.room[first.name] + 1
             self.room[second.name] = self.room[second.name] + 1
 
-            return True
+            return TurnResult.next_turn
 
         if first.answer == LIE_WORD:
             self.room[first.name] = self.room[first.name] + 2
@@ -40,7 +80,11 @@ class Game:
         if second.answer == LIE_WORD:
             self.room[second.name] = self.room[second.name] + 2
 
-        return True
+        if len(self.pairs) == 0:
+            return TurnResult.game_ended
+
+        self.curr = self.pairs.pop()
+        return TurnResult.next_turn
 
     def build_stats(self):
         msg = ''
@@ -60,12 +104,12 @@ class Player:
 
 
 def pair_up(players_arg):
-        players = players_arg.copy()
-        pairs = list()
-        while players:
-            last = players.pop()
+    players = players_arg.copy()
+    pairs = list()
+    while players:
+        last = players.pop()
 
-            for curr in players:
-                pairs.append((Player(last), Player(curr)))
+        for curr in players:
+            pairs.append((Player(last), Player(curr)))
 
-        return pairs
+    return pairs

@@ -1,64 +1,71 @@
 from telegram.ext import Updater, CommandHandler
-from game.game import Game, pair_up
+from game.game import Game, TurnResult
 from localization import *
 
 import logging
-import random
 import os
 
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 token = os.environ['VITEKER_TELEGRAM_BOT_TOKEN']
 game = Game()
 
 
-def start(update, context):
-    if game.is_started is True or game.is_created is False:
+def play(update, context):
+    if not game.is__created:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_WARN_TEXT)
+        return
+    if len(game.room) < 2:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=NOT_ENOUGH_PLAYERS_TEXT)
         return
 
-    game.is_started = True
-    players = list(game.room)
-    pairs = pair_up(players)
-    random.shuffle(pairs)
-    players_text = ', '.join(players)
-    game.curr = pairs.pop()
+    game.play()
+    players_text = ', '.join(game.players)
     context.bot.send_message(chat_id=update.effective_chat.id, text=START_TEXT % (players_text, game.curr))
 
 
 def create(update, context):
-    if game.is_created is True:
+    if not game.is__idle:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_ERROR_TEXT)
         return
 
-    game.room.clear()
-    game.is_created = True
+    game.create_room()
     context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_TEXT)
 
 
 def connect(update, context):
-    if game.is_created is not True:
+    if not game.is__created:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=CONNECT_WARN_TEXT)
         return
 
     user = update.message.from_user.username
-    game.room[user] = 0
+    game.join(user)
     context.bot.send_message(chat_id=update.effective_chat.id, text=CONNECTION_TEXT % {"user": user})
 
 
 def stop(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=GAME_OVER_TEXT % {'stats': game.build_stats()})
-
-    game.room.clear()
-    game.is_created = False
-    game.is_started = False
+    game.stop()
 
 
 def say(update, context):
     player = game.get_current_by_name(update.message.from_user.username)
 
-    if player is None or player.answer is not None:
+    if player is None:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=NOT_CURRENT_TEXT % {'name': player.name})
+        return
+
+    if player.answer is not None:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=ALREADY_ANSWERED_TEXT % {'name': player.name})
         return
 
     if len(context.args) == 0:
-        context.bot.send_message(chat_id=update.effective_chat.id, text='BLALALALLALA')
+        context.bot.send_message(chat_id=update.effective_chat.id, text=SAY_ARGS_WARN_TEXT % {
+            'name': player.name,
+            'believe': BELIEVE_WORD,
+            'lie': LIE_WORD
+        })
         return
 
     said = context.args[0]
@@ -72,17 +79,15 @@ def say(update, context):
         return
 
     player.answer = said
-    res = game.turn()
+    turn_res = game.turn()
 
-    if not res:
+    if turn_res == TurnResult.keep_turn:
         return
 
-    if len(game.pairs) == 0:
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text='Напиши в общий чат /stop.')
+    if turn_res == TurnResult.game_ended:
+        stop(update, context)
         return
 
-    game.curr = game.pairs.pop()
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=SAY_NEXT_PAIR % {'pair': game.curr})
 
@@ -96,13 +101,10 @@ def about(update, context):
                              )
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-
 updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
 
-start_handler = CommandHandler('start', start)
+start_handler = CommandHandler('play', play)
 create_handler = CommandHandler('create', create)
 connect_handler = CommandHandler('connect', connect)
 stop_handler = CommandHandler('stop', stop)

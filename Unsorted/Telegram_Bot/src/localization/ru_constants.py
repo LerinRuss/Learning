@@ -7,11 +7,18 @@ SAY_WRONG_TEXT = '%(name)s принимаются ответы `%(believe)s` or 
 SAY_NEXT_PAIR = 'Следующая пара:%(pair)s'
 GAME_OVER_TEXT = 'Игра окончена. Статистика:\n%(stats)s'
 CONNECTION_TEXT = '%(user)s присоеденился.'
-CREATE_ROOM_TEXT = ("""Окей, комната создана. Теперь пиши /connect комманду, чтобы присоедениться."""
+CREATE_ROOM_TEXT = ("""Окей, комната создана. Теперь пишите /connect комманду, чтобы присоедениться."""
                     """И когда все присоединятся пиши /start""")
 START_TEXT = ("""Игра началась. Следующие игроки участвуют:\n%s\n\nПервая пара: %s. """
               """Я принимаю сообщения только от них.\nПишите следующую комманду для ответа /say <your_answer>. 
               <your_answer> либо `верю` или `лгу` без кавычек""")
+CREATE_ROOM_WARN_TEXT = """Создайте комнату сначала."""
+CREATE_ROOM_ERROR_TEXT = """Сначала остановите текущую игру, прежде чем создавать новую."""
+NOT_ENOUGH_PLAYERS_TEXT = """Для игры требуется минимум два человека"""
+CONNECT_WARN_TEXT = """Прежде чем присоединяться, создайте комнату."""
+ALREADY_ANSWERED_TEXT = """%(name)ы уже дал ответ."""
+NOT_CURRENT_TEXT = """%(name)s сейчас не ты отвечаешь."""
+SAY_ARGS_WARN_TEXT = """%(name)s отправь /say <arg>  где <arg> либо %(believe)s или %(lie)s"""
 
 BELIEVE_WORD = 'верю'
 LIE_WORD = 'лгу'
