@@ -1,5 +1,5 @@
 CONNECT_BUTTON_TEXT = 'Присоединиться.'
 PLAY_BUTTON_TEXT = 'Играть.'
 
-BELIEVE_BUTTON_TEXT = 'Верю.'
-LIE_BUTTON_TEXT = 'Лгу.'
+BELIEVE_BUTTON_TEXT = 'Доверяю.'
+LIE_BUTTON_TEXT = 'Обманываю.'

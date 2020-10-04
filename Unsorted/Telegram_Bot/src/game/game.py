@@ -1,5 +1,4 @@
 from statemachine import StateMachine, State
-from localization import *
 from enum import Enum
 
 import random
