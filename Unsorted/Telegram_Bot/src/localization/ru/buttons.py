@@ -1,3 +1,5 @@
-CONNECT_TEXT = 'Присоедениться.'
-PLAY_TEXT = 'Играть.'
-STOP_TEXT = 'Остановить игру.'
+CONNECT_BUTTON_TEXT = 'Присоединиться.'
+PLAY_BUTTON_TEXT = 'Играть.'
+
+BELIEVE_BUTTON_TEXT = 'Верю.'
+LIE_BUTTON_TEXT = 'Лгу.'

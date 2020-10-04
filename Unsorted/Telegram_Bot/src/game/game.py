@@ -11,6 +11,11 @@ class TurnResult(Enum):
     game_ended = 3
 
 
+class GameWord(Enum):
+    believe = 1
+    lie = 2
+
+
 class Game(StateMachine):
     _idle = State('Idle', initial=True)
     _created = State('Created')
@@ -24,7 +29,6 @@ class Game(StateMachine):
         super().__init__(*args, **kwargs)
         self.room = dict()
         self.pairs = list()
-        self.players = list()
         self.curr = None
 
     def create_room(self):
@@ -32,10 +36,9 @@ class Game(StateMachine):
         self._create()
 
     def play(self):
-        self.players = list(self.room)
-        pairs = pair_up(self.players)
-        random.shuffle(pairs)
-        self.curr = pairs.pop()
+        self.pairs = pair_up(list(self.room))
+        random.shuffle(self.pairs)
+        self.curr = self.pairs.pop()
         self._play()
 
     def join(self, player_name):
@@ -47,7 +50,6 @@ class Game(StateMachine):
 
     def clear(self):
         self.room.clear()
-        self.players.clear()
 
     def get_current_by_name(self, player_name):
         if self.curr[0].name == player_name:
@@ -65,26 +67,29 @@ class Game(StateMachine):
         if first.answer is None or second.answer is None:
             return TurnResult.keep_turn
 
-        if first.answer == LIE_WORD and second.answer == LIE_WORD:
-            return TurnResult.next_turn
-
-        if first.answer == BELIEVE_WORD and second.answer == BELIEVE_WORD:
-            self.room[first.name] = self.room[first.name] + 1
-            self.room[second.name] = self.room[second.name] + 1
-
-            return TurnResult.next_turn
-
-        if first.answer == LIE_WORD:
-            self.room[first.name] = self.room[first.name] + 2
-
-        if second.answer == LIE_WORD:
-            self.room[second.name] = self.room[second.name] + 2
+        self.score_points(first, second)
 
         if len(self.pairs) == 0:
             return TurnResult.game_ended
 
         self.curr = self.pairs.pop()
         return TurnResult.next_turn
+
+    def score_points(self, first, second):
+        if first.answer == GameWord.lie and second.answer == GameWord.lie:
+            return
+
+        if first.answer == GameWord.believe and second.answer == GameWord.believe:
+            self.room[first.name] = self.room[first.name] + 1
+            self.room[second.name] = self.room[second.name] + 1
+
+            return
+
+        if first.answer == GameWord.lie:
+            self.room[first.name] = self.room[first.name] + 2
+
+        if second.answer == GameWord.lie:
+            self.room[second.name] = self.room[second.name] + 2
 
     def build_stats(self):
         msg = ''

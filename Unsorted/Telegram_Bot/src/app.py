@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from game.game import Game, TurnResult
+from game.game import Game, TurnResult, GameWord
 from localization import *
 
 import logging
@@ -9,7 +9,9 @@ import os
 
 REGEX_CONNECT = 'connect'
 REGEX_PLAY = 'play'
-REGEX_STOP = 'stop'
+
+REGEX_BELIEVE = 'believe'
+REGEX_LIE = 'lie'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 token = os.environ['VITEKER_TELEGRAM_BOT_TOKEN']
@@ -25,8 +27,17 @@ def play(update, context):
         return
 
     game.play()
-    players_text = ', '.join(game.players)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=START_TEXT % (players_text, game.curr))
+
+    callback_query = update.callback_query
+    keyboard_buttons = [[InlineKeyboardButton(BELIEVE_BUTTON_TEXT, callback_data=REGEX_BELIEVE)],
+                        [InlineKeyboardButton(LIE_BUTTON_TEXT, callback_data=REGEX_LIE)]]
+
+    players_text = ', '.join(list(game.room))
+    callback_query.edit_message_text(
+        PLAY_TEXT % {
+            'players': players_text,
+            'pair': game.curr},
+        reply_markup=InlineKeyboardMarkup(keyboard_buttons))
 
 
 def create(update, context):
@@ -36,9 +47,8 @@ def create(update, context):
 
     game.create_room()
 
-    keyboard_buttons = [[InlineKeyboardButton(CONNECT_TEXT, callback_data=REGEX_CONNECT)],
-                [InlineKeyboardButton(PLAY_TEXT, callback_data=REGEX_PLAY)],
-                [InlineKeyboardButton(STOP_TEXT, callback_data=REGEX_STOP)]]
+    keyboard_buttons = [[InlineKeyboardButton(CONNECT_BUTTON_TEXT, callback_data=REGEX_CONNECT)],
+                        [InlineKeyboardButton(PLAY_BUTTON_TEXT, callback_data=REGEX_PLAY)]]
     keyboard = InlineKeyboardMarkup(keyboard_buttons)
     context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_TEXT, reply_markup=keyboard)
 
@@ -48,19 +58,29 @@ def connect(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=CONNECT_WARN_TEXT)
         return
 
-    user = update.message.from_user.username
+    callback_query = update.callback_query
+    user = callback_query.from_user.username
+    callback_query.answer()
+    if user in game.room:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=ALREADY_CONNECTED_TEXT % {'user': user})
+        return
+
     game.join(user)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=CONNECTION_TEXT % {"user": user})
+    callback_query.edit_message_text(CREATE_ROOM_TEXT + '\n' + CONNECTION_TEXT % {"players": ', '.join(list(game.room))},
+                                     reply_markup=callback_query.message.reply_markup)
 
 
-def stop(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=GAME_OVER_TEXT % {'stats': game.build_stats()})
-    game.stop()
+def believe(update, context):
+    say_answer(update, context, GameWord.believe)
 
 
-def say(update, context):
-    player = game.get_current_by_name(update.message.from_user.username)
+def lie(update, context):
+    say_answer(update, context, GameWord.lie)
+
+
+def say_answer(update, context, answer):
+    callback_query = update.callback_query
+    player = game.get_current_by_name(callback_query.from_user.username)
 
     if player is None:
         context.bot.send_message(chat_id=update.effective_chat.id, text=NOT_CURRENT_TEXT % {'name': player.name})
@@ -70,66 +90,51 @@ def say(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=ALREADY_ANSWERED_TEXT % {'name': player.name})
         return
 
-    if len(context.args) == 0:
-        context.bot.send_message(chat_id=update.effective_chat.id, text=SAY_ARGS_WARN_TEXT % {
-            'name': player.name,
-            'believe': BELIEVE_WORD,
-            'lie': LIE_WORD
-        })
-        return
-
-    said = context.args[0]
-    if not said == BELIEVE_WORD and not said == LIE_WORD:
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text=SAY_WRONG_TEXT % {
-                                          'name': player.name,
-                                          'believe': BELIEVE_WORD,
-                                          'lie': LIE_WORD
-                                      })
-        return
-
-    player.answer = said
+    player.answer = answer
     turn_res = game.turn()
 
     if turn_res == TurnResult.keep_turn:
         return
 
     if turn_res == TurnResult.game_ended:
-        stop(update, context)
+        callback_query.answer()
+        stop(callback_query)
         return
 
+    callback_query.answer()
+    callback_query.edit_message_text(SAY_NEXT_PAIR % {'pair': game.curr},
+                                     reply_markup=callback_query.message.reply_markup)
+
+
+def stop(callback_query):
+    callback_query.edit_message_text(GAME_OVER_TEXT % {'stats': game.build_stats()})
+    game.stop()
+
+
+def force_stop(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=SAY_NEXT_PAIR % {'pair': game.curr})
+                             text=GAME_OVER_TEXT % {'stats': game.build_stats()})
+    game.stop()
 
 
 def about(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=ABOUT_TEXT % {
-                                      'believe': BELIEVE_WORD,
-                                      'lie': LIE_WORD
-                                  }
-                             )
+    context.bot.send_message(chat_id=update.effective_chat.id, text=ABOUT_TEXT)
 
-def connect_handler(update, context):
-    pass
 
 updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
 
-start_handler = CommandHandler('play', play)
 create_handler = CommandHandler('create', create)
-# connect_handler = CommandHandler('connect', connect)
-stop_handler = CommandHandler('stop', stop)
-say_handler = CommandHandler('say', say)
+force_stop_handler = CommandHandler('force_stop', force_stop)
 about_handler = CommandHandler('about', about)
 
-dispatcher.add_handler(start_handler)
-dispatcher.add_handler(connect_handler)
 dispatcher.add_handler(create_handler)
-dispatcher.add_handler(CallbackQueryHandler(connect_handler,))
-dispatcher.add_handler(connect_handler)
-dispatcher.add_handler(stop_handler)
-dispatcher.add_handler(say_handler)
+dispatcher.add_handler(force_stop_handler)
 dispatcher.add_handler(about_handler)
+dispatcher.add_handler(CallbackQueryHandler(connect, pattern=REGEX_CONNECT))
+dispatcher.add_handler(CallbackQueryHandler(play, pattern=REGEX_PLAY))
+dispatcher.add_handler(CallbackQueryHandler(believe, pattern=REGEX_BELIEVE))
+dispatcher.add_handler(CallbackQueryHandler(lie, pattern=REGEX_LIE))
 
 updater.start_polling()
+updater.idle()
