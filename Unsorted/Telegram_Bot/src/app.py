@@ -1,10 +1,15 @@
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from game.game import Game, TurnResult
 from localization import *
 
 import logging
 import os
 
+
+REGEX_CONNECT = 'connect'
+REGEX_PLAY = 'play'
+REGEX_STOP = 'stop'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 token = os.environ['VITEKER_TELEGRAM_BOT_TOKEN']
@@ -30,7 +35,12 @@ def create(update, context):
         return
 
     game.create_room()
-    context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_TEXT)
+
+    keyboard_buttons = [[InlineKeyboardButton(CONNECT_TEXT, callback_data=REGEX_CONNECT)],
+                [InlineKeyboardButton(PLAY_TEXT, callback_data=REGEX_PLAY)],
+                [InlineKeyboardButton(STOP_TEXT, callback_data=REGEX_STOP)]]
+    keyboard = InlineKeyboardMarkup(keyboard_buttons)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=CREATE_ROOM_TEXT, reply_markup=keyboard)
 
 
 def connect(update, context):
@@ -100,13 +110,15 @@ def about(update, context):
                                   }
                              )
 
+def connect_handler(update, context):
+    pass
 
 updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
 
 start_handler = CommandHandler('play', play)
 create_handler = CommandHandler('create', create)
-connect_handler = CommandHandler('connect', connect)
+# connect_handler = CommandHandler('connect', connect)
 stop_handler = CommandHandler('stop', stop)
 say_handler = CommandHandler('say', say)
 about_handler = CommandHandler('about', about)
@@ -114,6 +126,7 @@ about_handler = CommandHandler('about', about)
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(connect_handler)
 dispatcher.add_handler(create_handler)
+dispatcher.add_handler(CallbackQueryHandler(connect_handler,))
 dispatcher.add_handler(connect_handler)
 dispatcher.add_handler(stop_handler)
 dispatcher.add_handler(say_handler)

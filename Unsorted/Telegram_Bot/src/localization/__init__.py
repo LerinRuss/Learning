@@ -1,1 +1,1 @@
-from localization.ru_constants import *
+from .ru import *
