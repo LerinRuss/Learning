@@ -128,7 +128,7 @@ def stop(callback_query):
 def force_stop(update, context):
     if game.is__idle:
         context.bot.send_message(chat_id=update.effective_chat.id, text=GAME_IS_NOT_PLAYED)
-        return 
+        return
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=GAME_OVER_TEXT % {'stats': game.build_stats()})
     game.stop()
