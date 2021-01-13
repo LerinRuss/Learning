@@ -1,4 +1,0 @@
-/home/vkharsekin/workstop/spark/spark-2.4.4-bin-hadoop2.7/bin/spark-submit \
-  --class SimpleApp \
-  --master local[4] \
-  target/scala-2.11/spark_2.11-0.1.jar
