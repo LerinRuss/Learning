@@ -1,0 +1,11 @@
+spring:
+  social:
+    facebook:
+      appId: "-"
+      appSecret: "-"
+    google:
+      appId: "-"
+      appSecret: "-"
+logging:
+  level:
+    root: DEBUG
