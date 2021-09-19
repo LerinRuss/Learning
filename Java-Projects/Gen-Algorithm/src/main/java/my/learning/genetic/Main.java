@@ -1,4 +1,4 @@
-package my;
+package my.learning.genetic;
 
 import java.util.ArrayList;
 import java.util.List;

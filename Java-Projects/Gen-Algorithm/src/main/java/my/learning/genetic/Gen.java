@@ -1,4 +1,4 @@
-package my;
+package my.learning.genetic;
 
 import java.util.Objects;
 import java.util.Random;
