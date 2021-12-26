@@ -9,11 +9,7 @@ from sc2.player import Bot, Computer
 from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, \
     ZEALOT, OBSERVER, ROBOTICSFACILITY
 from sc2.data import Result
-
-MAX_WORKERS = 60
-UNITS_DEFENCE_MIN = {ZEALOT: 4,
-                     VOIDRAY: 2}
-HEADLESS = True
+from constants import *
 
 class SimpleBot(sc2.BotAI):
     def __init__(self):
