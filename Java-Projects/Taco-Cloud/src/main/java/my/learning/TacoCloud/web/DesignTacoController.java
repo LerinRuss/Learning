@@ -8,12 +8,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import my.learning.TacoCloud.Ingredient;
 import my.learning.TacoCloud.Taco;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -35,17 +38,17 @@ public class DesignTacoController {
 
     @GetMapping
     public String showDesignForm(Model model) {
-        for (Type type : Type.values()) {
-            model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
-        }
-
         model.addAttribute("design", new Taco());
 
         return "design";
     }
 
     @PostMapping
-    public String processDesign(Taco design) {
+    public String processDesign(@Valid @ModelAttribute("design") Taco design, Errors errors) {
+        if (errors.hasErrors()) {
+            return "design";
+        }
+
         log.info("Processing design: {}", design);
 
         return "redirect:/orders/current";
@@ -55,5 +58,12 @@ public class DesignTacoController {
         return ingredients.stream()
             .filter(ingredient -> ingredient.getType() == type)
             .collect(Collectors.toList());
+    }
+
+    @ModelAttribute
+    private void addIngredientsToModel(Model model) {
+        for (Type type : Type.values()) {
+            model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
+        }
     }
 }
