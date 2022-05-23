@@ -1,8 +1,8 @@
-package my.learning.TacoCloud.web;
+package my.learning.taco_cloud.web;
 
 import javax.validation.Valid;
 import lombok.extern.log4j.Log4j2;
-import my.learning.TacoCloud.Order;
+import my.learning.taco_cloud.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;

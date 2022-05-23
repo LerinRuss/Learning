@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'my.learning.Taco-Cloud' is invalid and this project uses 'my.learning.TacoCloud' instead.
+* The original package name 'my.learning.Taco-Cloud' is invalid and this project uses 'my.learning.taco_cloud' instead.
 
 # Getting Started
 

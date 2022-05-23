@@ -1,4 +1,4 @@
-package my.learning.TacoCloud;
+package my.learning.taco_cloud;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

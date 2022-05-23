@@ -1,4 +1,4 @@
-package my.learning.TacoCloud;
+package my.learning.taco_cloud;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

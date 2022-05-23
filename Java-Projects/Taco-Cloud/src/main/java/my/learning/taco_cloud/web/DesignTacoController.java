@@ -1,17 +1,14 @@
-package my.learning.TacoCloud.web;
+package my.learning.taco_cloud.web;
 
-import static my.learning.TacoCloud.Ingredient.*;
+import static my.learning.taco_cloud.Ingredient.*;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.extern.log4j.Log4j2;
-import my.learning.TacoCloud.Ingredient;
-import my.learning.TacoCloud.Taco;
+import my.learning.taco_cloud.Ingredient;
+import my.learning.taco_cloud.Taco;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
