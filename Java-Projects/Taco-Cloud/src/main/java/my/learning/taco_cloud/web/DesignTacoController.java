@@ -5,10 +5,14 @@ import static my.learning.taco_cloud.Ingredient.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import my.learning.taco_cloud.Ingredient;
 import my.learning.taco_cloud.Taco;
+import my.learning.taco_cloud.data.IngredientRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -16,11 +20,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Log4j2
 @Controller
 @RequestMapping("/design")
+@SessionAttributes("order")
+@RequiredArgsConstructor
 public class DesignTacoController {
+    private final IngredientRepository ingredientRepository;
+
     List<Ingredient> ingredients = Arrays.asList(
         new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
         new Ingredient("COTO", "Corn Tortilla", Type.WRAP),
@@ -35,7 +44,13 @@ public class DesignTacoController {
 
     @GetMapping
     public String showDesignForm(Model model) {
-        model.addAttribute("design", new Taco());
+        List<Ingredient> ingredients = StreamSupport.stream(ingredientRepository.findAll().spliterator(), false)
+                        .collect(Collectors.toList());
+
+        Type[] types = Ingredient.Type.values();
+        for (Type type : types) {
+            model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
+        }
 
         return "design";
     }
@@ -57,10 +72,8 @@ public class DesignTacoController {
             .collect(Collectors.toList());
     }
 
-    @ModelAttribute
-    private void addIngredientsToModel(Model model) {
-        for (Type type : Type.values()) {
-            model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
-        }
+    @ModelAttribute(name = "taco")
+    public Taco taco() {
+        return new Taco();
     }
 }
