@@ -11,8 +11,10 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import my.learning.taco_cloud.Ingredient;
+import my.learning.taco_cloud.Order;
 import my.learning.taco_cloud.Taco;
 import my.learning.taco_cloud.data.IngredientRepository;
+import my.learning.taco_cloud.data.TacoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @RequiredArgsConstructor
 public class DesignTacoController {
     private final IngredientRepository ingredientRepository;
+    private final TacoRepository tacoRepository;
 
     List<Ingredient> ingredients = Arrays.asList(
         new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
@@ -56,10 +59,14 @@ public class DesignTacoController {
     }
 
     @PostMapping
-    public String processDesign(@Valid @ModelAttribute("design") Taco design, Errors errors) {
+    public String processDesign(@Valid @ModelAttribute("design") Taco design, Errors errors,
+                                @ModelAttribute Order order) {
         if (errors.hasErrors()) {
             return "design";
         }
+
+        Taco saved = tacoRepository.save(design);
+        order.addDesign(saved);
 
         log.info("Processing design: {}", design);
 
@@ -70,6 +77,11 @@ public class DesignTacoController {
         return ingredients.stream()
             .filter(ingredient -> ingredient.getType() == type)
             .collect(Collectors.toList());
+    }
+
+    @ModelAttribute(name = "order")
+    public Order order() {
+        return new Order();
     }
 
     @ModelAttribute(name = "taco")
