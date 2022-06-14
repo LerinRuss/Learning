@@ -1,4 +1,4 @@
-package my.learning.taco_cloud;
+package my.learning.taco_cloud.security;
 
 import lombok.RequiredArgsConstructor;
 import my.learning.taco_cloud.security.JpaUserRepository;
