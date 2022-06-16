@@ -25,7 +25,6 @@ import org.springframework.web.bind.support.SessionStatus;
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
-    private final JpaUserRepository userRepository;
     private final JpaOrderRepository orderRepository;
 
     @GetMapping("/current")
