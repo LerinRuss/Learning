@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
@@ -24,9 +25,6 @@ import lombok.Data;
 @Entity
 @Table(name="Taco_Order")
 public class Order implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
@@ -60,6 +58,9 @@ public class Order implements Serializable {
 
     @ManyToMany(targetEntity=Taco.class)
     private List<Taco> tacos = new ArrayList<>();
+
+    @ManyToOne
+    private User user;
 
     public void addDesign(Taco design) {
         this.tacos.add(design);
