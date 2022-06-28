@@ -18,3 +18,11 @@ spring:
       - user-schema.sql
     data:
       - ingredients.sql
+logging:
+  path: /var/logs/
+  file: TacoCloud.log
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
