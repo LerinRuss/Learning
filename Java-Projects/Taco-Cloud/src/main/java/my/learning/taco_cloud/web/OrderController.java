@@ -50,4 +50,11 @@ public class OrderController {
 
         return "redirect:/";
     }
+
+    @GetMapping
+    public String orderForUser(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("order", orderRepository.findByUserOrderByPlacedAtDesc(user));
+
+        return "orderList";
+    }
 }

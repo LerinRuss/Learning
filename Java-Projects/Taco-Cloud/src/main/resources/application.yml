@@ -26,3 +26,5 @@ logging:
     org:
       springframework:
         security: DEBUG
+greeting:
+  welcome: You are using ${spring.application.name}
