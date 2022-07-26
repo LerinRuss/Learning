@@ -1,7 +1,7 @@
 server:
   port: 8443
   ssl:
-    key-store: file://~/.keystore/mykeys.jks
+    key-store: file://~/.keystore/taco-cloud.jks
     key-store-password: <key-store-password>
     key-password: <key-password>
 spring:
