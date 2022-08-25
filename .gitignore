@@ -1,4 +1,5 @@
 target/
+build/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -9,8 +10,10 @@ buildNumber.properties
 .mvn/timing.properties
 *.iml
 .idea
+.gradle/
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
 /JMonkeyGame/.gradle/
 /JMonkeyGame/build/
+/Java-Projects/.gradle/
