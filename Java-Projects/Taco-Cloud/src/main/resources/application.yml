@@ -5,6 +5,9 @@ server:
     key-store-password: <key-store-password>
     key-password: <key-password>
 spring:
+  profiles:
+    active:
+      - local
   datasource:
     url: jdbc:postgresql://localhost:5432/taco_cloud
     username: your_username
@@ -22,8 +25,21 @@ logging:
   path: /var/logs/
   file: TacoCloud.log
   level:
-    root: WARN
+    root: DEBUG
     org.springframework.security: DEBUG
 greeting:
   welcome: You are using ${spring.application.name}
 taco.orders.page-size: 10
+
+---
+spring:
+  profiles: prod
+
+  datasource:
+    url: jdbc:mysql://localhost/tacocloud
+    username: tacouser
+    password: tacopassword
+
+logging:
+  lvel:
+    root: WARN
