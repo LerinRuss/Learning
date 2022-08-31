@@ -1,19 +1,13 @@
 server:
   port: 8443
   ssl:
-    key-store: file://~/.keystore/taco-cloud.jks
+    key-store: file://.keystore/taco-cloud.jks
     key-store-password: <key-store-password>
     key-password: <key-password>
 spring:
   profiles:
     active:
       - local
-  datasource:
-    url: jdbc:postgresql://localhost:5432/taco_cloud
-    username: your_username
-    password: your_password
-#    driver-class-name: com.postgresql.jdbc.Driver
-#    jndi-name: java:/comp/env/jdbc/tacoCloudDS
     schema:
       - order-schema.sql
       - ingredient-schema.sql
