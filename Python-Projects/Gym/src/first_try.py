@@ -1,10 +1,10 @@
 import gym
 
 env = gym.make("LunarLander-v2")
-observation, info = env.reset(seed=42)
+observation = env.reset(seed=42)
 
-def policy():
-    pass
+def policy(observation):
+    return 0
 
 for _ in range(1000):
    env.render()
@@ -12,5 +12,5 @@ for _ in range(1000):
    observation, reward, done, info = env.step(action)
 
    if done:
-      observation, info = env.reset()
+      observation = env.reset()
 env.close()
