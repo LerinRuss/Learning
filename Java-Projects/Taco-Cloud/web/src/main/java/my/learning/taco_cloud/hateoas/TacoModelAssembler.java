@@ -1,7 +1,7 @@
-package my.learning.taco_cloud.api;
+package my.learning.taco_cloud.hateoas;
 
+import my.learning.taco_cloud.api.DesignTacoController;
 import my.learning.taco_cloud.entity.Taco;
-import my.learning.taco_cloud.web.DesignTacoController;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 
 public class TacoModelAssembler extends RepresentationModelAssemblerSupport<Taco, TacoModel> {

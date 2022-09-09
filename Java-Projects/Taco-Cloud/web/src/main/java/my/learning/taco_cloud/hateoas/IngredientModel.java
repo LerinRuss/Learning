@@ -1,4 +1,4 @@
-package my.learning.taco_cloud.api;
+package my.learning.taco_cloud.hateoas;
 
 import static my.learning.taco_cloud.entity.Ingredient.Type;
 

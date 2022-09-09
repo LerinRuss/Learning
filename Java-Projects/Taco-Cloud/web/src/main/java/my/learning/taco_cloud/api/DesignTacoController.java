@@ -1,18 +1,17 @@
-package my.learning.taco_cloud.web;
+package my.learning.taco_cloud.api;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import my.learning.taco_cloud.api.TacoModel;
-import my.learning.taco_cloud.api.TacoModelAssembler;
 import my.learning.taco_cloud.data.TacoRepository;
 import my.learning.taco_cloud.entity.Taco;
+import my.learning.taco_cloud.hateoas.TacoModel;
+import my.learning.taco_cloud.hateoas.TacoModelAssembler;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

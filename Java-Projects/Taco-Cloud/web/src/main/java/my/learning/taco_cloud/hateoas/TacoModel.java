@@ -1,4 +1,4 @@
-package my.learning.taco_cloud.api;
+package my.learning.taco_cloud.hateoas;
 
 import java.util.Date;
 import lombok.Value;

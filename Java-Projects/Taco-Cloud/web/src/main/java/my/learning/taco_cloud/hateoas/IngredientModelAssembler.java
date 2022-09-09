@@ -1,5 +1,6 @@
-package my.learning.taco_cloud.api;
+package my.learning.taco_cloud.hateoas;
 
+import my.learning.taco_cloud.api.IngredientController;
 import my.learning.taco_cloud.entity.Ingredient;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 
