@@ -1,16 +1,18 @@
 package my.learning.taco_cloud.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import my.learning.taco_cloud.api.TacoModel;
+import my.learning.taco_cloud.api.TacoModelAssembler;
 import my.learning.taco_cloud.data.TacoRepository;
 import my.learning.taco_cloud.entity.Taco;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.EntityLinks;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,19 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DesignTacoController {
     private final TacoRepository tacoRepository;
-    private final EntityLinks entityLinks;
 
     @GetMapping("/recent")
-    public CollectionModel<EntityModel<Taco>> recentTacos() {
+    public CollectionModel<TacoModel> recentTacos() {
         PageRequest page = PageRequest.of(0, 12, Sort.by("createdAt").descending());
         List<Taco> tacos = tacoRepository.findAll(page).getContent();
-        CollectionModel<EntityModel<Taco>> recentResources = CollectionModel.wrap(tacos);
 
-        recentResources.add(
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(DesignTacoController.class).recentTacos())
-                        .withRel("recents"));
+        CollectionModel<TacoModel> tacoModels =
+                new TacoModelAssembler().toCollectionModel(tacos);
+        tacoModels.add(
+                linkTo(methodOn(DesignTacoController.class).recentTacos())
+                    .withRel("recents"));
 
-        return recentResources;
+        return tacoModels;
     }
 
     @GetMapping("/{id}")
