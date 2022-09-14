@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+//@RestController
 @RequestMapping(path = "/design", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class DesignTacoController {

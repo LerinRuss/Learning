@@ -5,8 +5,10 @@ import lombok.Value;
 import my.learning.taco_cloud.entity.Taco;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Value
+@Relation(value = "taco", collectionRelation = "tacos")
 public class TacoModel extends RepresentationModel<TacoModel> {
     private static final IngredientModelAssembler ingredientAssembler = new IngredientModelAssembler();
 
