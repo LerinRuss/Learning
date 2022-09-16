@@ -1,12 +1,12 @@
 package my.learning.taco_cloud.hateoas;
 
-import my.learning.taco_cloud.api.DesignTacoController;
+import my.learning.taco_cloud.api.RecentTacosController;
 import my.learning.taco_cloud.entity.Taco;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 
 public class TacoModelAssembler extends RepresentationModelAssemblerSupport<Taco, TacoModel> {
     public TacoModelAssembler() {
-        super(DesignTacoController.class, TacoModel.class);
+        super(RecentTacosController.class, TacoModel.class);
     }
 
     @Override

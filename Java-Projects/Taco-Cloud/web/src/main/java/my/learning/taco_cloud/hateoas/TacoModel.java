@@ -10,15 +10,15 @@ import org.springframework.hateoas.server.core.Relation;
 @Value
 @Relation(value = "taco", collectionRelation = "tacos")
 public class TacoModel extends RepresentationModel<TacoModel> {
-    private static final IngredientModelAssembler ingredientAssembler = new IngredientModelAssembler();
+//    private static final IngredientModelAssembler ingredientAssembler = new IngredientModelAssembler();
 
     String name;
     Date createdAt;
-    CollectionModel<IngredientModel> ingredients;
+//    CollectionModel<IngredientModel> ingredients;
 
     public TacoModel(Taco taco) {
         this.name = taco.getName();
         this.createdAt = taco.getCreatedAt();
-        this.ingredients = ingredientAssembler.toCollectionModel(taco.getIngredients());
+//        this.ingredients = ingredientAssembler.toCollectionModel(taco.getIngredients());
     }
 }
