@@ -5,6 +5,8 @@ import os
 import json
 import numpy
 
+from src.agent import Agent
+
 BASE_PATH = 'Store/Car/Json/'
 FILE_NAME = 'agent.json'
 
@@ -34,13 +36,13 @@ def load() -> Union[SavedAgent, None]:
 
             saved_agent = json.load(file)
 
-        q_values = {tuple(map(int, k.strip("()").split(","))): numpy.array(v) for k, v in saved_agent['q_values']}
+        q_values = {tuple(map(int, k.strip("()").split(","))): numpy.array(v) for k, v in saved_agent['q_values'].items()}
         return SavedAgent(saved_agent['last_learnt_step'], saved_agent['last_epsilon'], q_values)
     except FileNotFoundError:
         return None
 
 
-def dump(last_learnt_step: int, last_epsilon: float, q_values: dict[tuple[int, int], ndarray]):
+def dump(last_learnt_step: int, agent: Agent):
     os.makedirs(BASE_PATH, mode=0o006, exist_ok=True)
     with open(BASE_PATH + FILE_NAME, 'w') as file:
-        json.dump(SavedAgent(last_learnt_step, last_epsilon,  q_values), file, cls=JsonEncoder, indent=2)
+        json.dump(SavedAgent(last_learnt_step, agent.epsilon, agent.q_values), file, cls=JsonEncoder, indent=2)

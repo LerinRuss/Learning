@@ -11,11 +11,12 @@ from learning import learn
 
 env = gym.make('MountainCar-v0', render_mode='human')
 
-num_steps = 1500
+common_step_number = 100_000
+num_steps = 1000
 
 learning_rate = 0.01
 start_epsilon = 1.0
-epsilon_decay = start_epsilon / (num_steps / 2)  # reduce the exploration over time
+epsilon_decay = 2 * start_epsilon / common_step_number  # reduce the exploration over time
 final_epsilon = 0.1
 
 
@@ -37,20 +38,7 @@ class CarAgent(Agent):
         return Agent.get_action(self, CarAgent._transform_obs(obs))
 
 
-saved_agent: Union[SavedAgent, None] = load()
-
-if saved_agent is None:
-    agent = CarAgent(
-        learning_rate=learning_rate,
-        initial_epsilon=start_epsilon,
-        epsilon_decay=epsilon_decay,
-        final_epsilon=final_epsilon,
-        default_q_value_factory=lambda: np.zeros(env.action_space.n),
-        existent_q_values=dict(),
-        action_factory=env.action_space.sample)
-else:
-    num_steps -= saved_agent.last_learnt_step
-
+def learn_saved_agent(saved_agent: SavedAgent):
     agent = CarAgent(
         learning_rate=learning_rate,
         initial_epsilon=saved_agent.last_epsilon,
@@ -60,8 +48,31 @@ else:
         existent_q_values=saved_agent.q_values,
         action_factory=env.action_space.sample)
 
-learn(env, agent, num_steps)
+    steps_to_learn = num_steps if saved_agent.last_learnt_step + num_steps <= common_step_number \
+        else common_step_number - saved_agent.last_learnt_step
 
-env.close()
+    learn(env, agent, steps_to_learn)
+    env.close()
+    dump(saved_agent.last_learnt_step + steps_to_learn, agent)
 
-dump(num_steps, agent.epsilon, agent.q_values)
+
+def start_learning():
+    agent = CarAgent(
+        learning_rate=learning_rate,
+        initial_epsilon=start_epsilon,
+        epsilon_decay=epsilon_decay,
+        final_epsilon=final_epsilon,
+        default_q_value_factory=lambda: np.zeros(env.action_space.n),
+        existent_q_values=dict(),
+        action_factory=env.action_space.sample)
+    learn(env, agent, num_steps)
+    env.close()
+    dump(num_steps, agent)
+
+
+saved_agent: Union[SavedAgent, None] = load()
+
+if saved_agent is not None:
+    learn_saved_agent(saved_agent)
+else:
+    start_learning()
