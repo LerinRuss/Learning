@@ -5,6 +5,8 @@ from src.agent import Agent
 
 
 def learn(env: Env, agent: Agent, n_episodes: int):
+    if n_episodes <= 0:
+        raise Exception(f'Number of episodes should be positive.')
     for episode in tqdm(range(n_episodes)):
         obs, _ = env.reset()
         done = False

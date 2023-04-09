@@ -12,18 +12,18 @@ from learning import learn
 env = gym.make('MountainCar-v0', render_mode='human')
 
 common_step_number = 100_000
-num_steps = 1000
+num_steps = 5
 
 learning_rate = 0.01
 start_epsilon = 1.0
-epsilon_decay = 2 * start_epsilon / common_step_number  # reduce the exploration over time
+epsilon_decay = 1.5 * start_epsilon / common_step_number  # reduce the exploration over time
 final_epsilon = 0.1
 
 
 class CarAgent(Agent):
     @staticmethod
     def _transform_obs(obs: ndarray[float, float]) -> tuple[int, int]:
-        return int(obs[0] * 100), int(obs[1] * 1000)
+        return int(obs[0] * 10), int(obs[1] * 1000)
 
     def __init__(self, learning_rate: float, initial_epsilon: float, epsilon_decay: float, final_epsilon: float,
                  default_q_value_factory, existent_q_values: [tuple[int, int], ndarray], action_factory):
