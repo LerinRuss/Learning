@@ -40,10 +40,10 @@ class CarAgent(Agent):
 
 def learn_saved_agent(saved_agent: SavedAgent):
     agent = CarAgent(
-        learning_rate=learning_rate,
+        learning_rate=saved_agent.learning_rate,
         initial_epsilon=saved_agent.last_epsilon,
-        epsilon_decay=epsilon_decay,
-        final_epsilon=final_epsilon,
+        epsilon_decay=saved_agent.epsilon_decay,
+        final_epsilon=saved_agent.final_epsilon,
         default_q_value_factory=lambda: np.zeros(env.action_space.n),
         existent_q_values=saved_agent.q_values,
         action_factory=env.action_space.sample)
