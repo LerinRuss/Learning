@@ -5,5 +5,5 @@
 ```commandline
 cd venv\Scripts
 Set-ExecutionPolicy Unrestricted -Scope Process 
-activate
+.\activate
 ```
