@@ -15,6 +15,9 @@ public class Brackets {
         // null, empty - true
 
         System.out.println("{[()]} - true, now is " + checkBrackets("{[()]}"));
+        System.out.println("{[()]}{[()]} - true, now is " + checkBrackets("{[()]}{[()]}"));
+        System.out.println("{[()]}{[()}]} - false, now is " + checkBrackets("{[()]}{[()}]}"));
+        System.out.println("()()) - false, now is " + checkBrackets("()())"));
         System.out.println("{([)]} = false, now is " + checkBrackets("{([)]}"));
         System.out.println("{([]} - false, now is " + checkBrackets("{([]}"));
         System.out.println("null, empty - true, now is " + checkBrackets(null));
