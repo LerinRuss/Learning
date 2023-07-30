@@ -1,0 +1,9 @@
+select t.id
+from topics t
+inner join readers r
+on r.t_id = t.id
+where (
+ifnull( t.ref, "n" ) = "a"
+or t.name = "messages"
+or t.name like "%'"
+) in ("sada", "loh");
