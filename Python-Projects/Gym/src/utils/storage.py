@@ -1,18 +1,18 @@
-from typing import Any, Union
+from typing import Any, Union, Dict, Tuple
 from numpy import ndarray
 
 import os
 import json
 import numpy
 
-from src.agent import Agent
+from src.utils.agent import Agent
 
 BASE_PATH = 'Store/Car/Json/'
 FILE_NAME = 'agent.json'
 
 
 class SavedAgent:
-    def __init__(self, last_learnt_step: int, last_epsilon: float, q_values: dict[tuple[int, int], ndarray],
+    def __init__(self, last_learnt_step: int, last_epsilon: float, q_values: Dict[Tuple[int, int], ndarray],
                  learning_rate: float, discount_factor: float, epsilon_decay: float, final_epsilon: float):
         self.last_learnt_step = last_learnt_step
         self.last_epsilon = last_epsilon

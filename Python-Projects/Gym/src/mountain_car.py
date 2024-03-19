@@ -1,17 +1,17 @@
-from typing import Union
-
 import gymnasium as gym
 import numpy as np
 
+from typing import Union, Tuple, Dict
 from numpy import ndarray
-from storage import SavedAgent, load, dump
+from gymnasium import Env
+from tqdm import tqdm
 
-from agent import Agent
-from learning import learn
+from src.utils.storage import SavedAgent, load, dump
+from src.utils.agent import Agent
 
 env = gym.make('MountainCar-v0', render_mode='human')
 
-common_step_number = 100_000
+common_step_number = 100_000_000
 num_steps = 5
 
 learning_rate = 0.01
@@ -21,21 +21,43 @@ final_epsilon = 0.1
 
 
 class CarAgent(Agent):
+
+    # obs: ndarray[float, float]
     @staticmethod
-    def _transform_obs(obs: ndarray[float, float]) -> tuple[int, int]:
+    def _transform_obs(obs: ndarray) -> Tuple[int, int]:
         return int(obs[0] * 10), int(obs[1] * 1000)
 
     def __init__(self, learning_rate: float, initial_epsilon: float, epsilon_decay: float, final_epsilon: float,
-                 default_q_value_factory, existent_q_values: [tuple[int, int], ndarray], action_factory):
+                 default_q_value_factory, existent_q_values: Dict[Tuple[int, int], ndarray], action_factory):
         super().__init__(learning_rate, initial_epsilon, epsilon_decay, final_epsilon, default_q_value_factory,
                          existent_q_values, action_factory)
 
-    def update(self, obs: ndarray[float, float], action: int, reward: float, terminated: bool,
+    # obs: ndarray[float, float]
+    def update(self, obs: ndarray, action: int, reward: float, terminated: bool,
                next_obs: [int, int, bool]):
         Agent.update(self, CarAgent._transform_obs(obs), action, reward, terminated, CarAgent._transform_obs(next_obs))
 
-    def get_action(self, obs: ndarray[float, float]) -> int:
+    # obs: ndarray[float, float]
+    def get_action(self, obs: ndarray) -> int:
         return Agent.get_action(self, CarAgent._transform_obs(obs))
+
+
+def learn(env: Env, agent: Agent, n_episodes: int):
+    if n_episodes <= 0:
+        raise Exception(f'Number of episodes should be positive.')
+    for episode in tqdm(range(n_episodes)):
+        obs, _ = env.reset()
+        done = False
+
+        while not done:
+            action = agent.get_action(obs)
+            next_obs, reward, terminated, truncated, _ = env.step(action)
+
+            agent.update(obs, action, reward, terminated, next_obs)
+
+            done = terminated or truncated
+            obs = next_obs
+        agent.decay_epsilon()
 
 
 def learn_saved_agent(saved_agent: SavedAgent):

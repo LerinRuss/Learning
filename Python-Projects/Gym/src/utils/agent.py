@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any
+from typing import Any, Dict, Tuple
 from numpy import ndarray
 
 import numpy as np
@@ -7,7 +7,7 @@ import numpy as np
 
 class Agent:
     def __init__(self, learning_rate: float, initial_epsilon: float, epsilon_decay: float, final_epsilon: float,
-                 default_q_value_factory, existent_q_values: [tuple[int, int], ndarray], action_factory,
+                 default_q_value_factory, existent_q_values: Dict[Tuple[int, int], ndarray], action_factory,
                  discount_factor: float = 0.95):
         self.q_values = defaultdict(default_q_value_factory, existent_q_values)
 
