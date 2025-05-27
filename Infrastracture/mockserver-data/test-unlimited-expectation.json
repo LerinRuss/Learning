@@ -1,0 +1,13 @@
+{
+  "httpRequest": {
+    "method": "GET",
+    "path": "/test"
+  },
+  "httpResponse": {
+    "statusCode": 200,
+    "body": "This is a non-persistent response"
+  },
+  "times": {
+    "unlimited": true
+  }
+}

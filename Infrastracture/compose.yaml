@@ -1,0 +1,83 @@
+services:
+  mongo:
+    ports:
+      - 27017:27017
+    image: mongo
+    restart: unless-stopped
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo:/data/db
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+  syncthing:
+    image: syncthing/syncthing
+    container_name: syncthing
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - .\syncthing:/var/syncthing
+    ports:
+      - 8384:8384 # Web UI
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
+    restart: unless-stopped
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+  syncthing-keepass:
+    image: syncthing/syncthing
+    container_name: syncthing-keepass
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - .\Syncthing-keepass:/var/syncthing
+    ports:
+      - 8385:8384 # Web UI
+      - 22001:22000/tcp # TCP file transfers
+      - 22001:22000/udp # QUIC file transfers
+      - 21028:21027/udp # Receive local discovery broadcasts
+    restart: unless-stopped
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+  mockserver:
+    image: mockserver/mockserver
+    ports:
+      - 1080:1080
+    environment:
+      - MOCKSERVER_PERSIST_EXPECTATIONS=true
+      - MOCKSERVER_PERSISTED_EXPECTATIONS_PATH=/config/expectations.json
+    volumes:
+      - ./mockserver-data:/config
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"   # HTTP Interface
+      - "9000:9000"   # Native Client
+    volumes:
+      - clickhouse:/var/lib/clickhouse
+    environment:
+      - CLICKHOUSE_USER=test
+      - CLICKHOUSE_PASSWORD=test
+volumes:
+  mongo:
+  clickhouse:
